@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class IndexController {
 
-    @RequestMapping("/calculator")
+    @RequestMapping("/index")
     public String calculator(){
-        return "calculator";
+        return "index";
     }
 
 }
