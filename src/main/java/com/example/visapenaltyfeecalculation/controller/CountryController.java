@@ -1,5 +1,7 @@
 package com.example.visapenaltyfeecalculation.controller;
 
+import com.example.visapenaltyfeecalculation.dto.CalculatorDto;
+import com.example.visapenaltyfeecalculation.dto.CountryDto;
 import com.example.visapenaltyfeecalculation.service.CountryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +21,12 @@ public class CountryController {
     private final CountryService countryService;
 
     @GetMapping("/countries")
-    public List<String> getAll() {
+    public List<CountryDto> getAll() {
         return countryService.getAll();
     }
 
     @GetMapping("/calculator")
-    public BigDecimal calculator(
+    public List<CalculatorDto> calculator(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) String entryDate,
             @RequestParam String visaValidityDate,
