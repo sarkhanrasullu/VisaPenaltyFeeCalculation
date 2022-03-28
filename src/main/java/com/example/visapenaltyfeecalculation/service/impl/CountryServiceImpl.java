@@ -36,6 +36,7 @@ public class CountryServiceImpl implements CountryService {
         calculatorDto.setFirstMonthPenaltyAmount(BigDecimal.valueOf(0));
         calculatorDto.setMonthlyPenaltyAmount(BigDecimal.valueOf(0));
         calculatorDto.setAdditionalDaysAmount(BigDecimal.valueOf(0));
+        calculatorDto.setCardFee(country.getCardFee());
         calculatorDto.setTurkishLira(turkishLira);
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -50,13 +51,12 @@ public class CountryServiceImpl implements CountryService {
             differentDateOfDays = entryLocalDate.until(validityLocalDate, ChronoUnit.DAYS);
         }
 
+        BigDecimal cardFee = country.getCardFee();
         BigDecimal visaFee;
-        BigDecimal cardFee = BigDecimal.valueOf(160.00);
-        calculatorDto.setCardFee(cardFee);
-        if (residencePermit.equals("Yes")) {
-            visaFee = BigDecimal.valueOf(0.00);
-        } else {
+        if (residencePermit.equals("No") && country.getVisaFee().equals(BigDecimal.valueOf(1033.6))){
             visaFee = BigDecimal.valueOf(1033.60);
+        } else {
+            visaFee = BigDecimal.valueOf(0.00);
         }
         calculatorDto.setVisaFee(visaFee);
 

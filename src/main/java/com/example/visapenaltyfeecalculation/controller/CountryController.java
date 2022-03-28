@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.List;
 
@@ -29,11 +28,9 @@ public class CountryController {
     public List<CalculatorDto> calculator(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) String entryDate,
-            @RequestParam String visaValidityDate,
+            @RequestParam(required = false) String visaValidityDate,
             @RequestParam(required = false) String residencePermit
     ) throws ParseException {
-       return countryService.calculator(id, entryDate, visaValidityDate, residencePermit);
+        return countryService.calculator(id, entryDate, visaValidityDate, residencePermit);
     }
-
-
 }

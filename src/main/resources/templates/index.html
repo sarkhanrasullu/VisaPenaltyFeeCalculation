@@ -14,25 +14,6 @@
 
 <script>
 
-    function fromDollarToTl() {
-        var xmlHttp = new XMLHttpRequest();
-        var url = "https://www.xe.com/api/protected/statistics/?from=USD&to=TRY";
-        xmlHttp.open("GET", url, false);
-        xmlHttp.setRequestHeader('Content-type', 'application/json');
-        xmlHttp.send(null);
-
-        var list = JSON.parse(xmlHttp.responseText);
-        list.last30Days = undefined;
-
-        var fromDollarToTl = document.getElementById("fromDollarToTl");
-
-        var fromDollarToTlTextBox =
-            "<button id=\"dollar\">Cevir</button>\n" +
-            "<label class=\"turkishTl\">:TL</label>";
-
-        fromDollarToTl.innerHTML += fromDollarToTlTextBox.replaceAll(":TL", list.last30Days.high);
-    }
-
     function showAllCounties() {
         var xmlHttp = new XMLHttpRequest();
         var url = "http://localhost:8080/visa/countries";
@@ -69,57 +50,6 @@
             "            </div>";
     }
 
-    function showResidencePermitYesAndNo() {
-        showResidencePermitYesAndNoWithoutValidityDate();
-    }
-
-    function pressResidenceDropdownNextButton() {
-        var residenceDropdownValue = document.getElementById("residencePermitDropdown").value;
-        if (residenceDropdownValue === "Yes" || residenceDropdownValue === "No") {
-            document.getElementById("requestButton").innerHTML =
-                "<button class=\"requestButton\" type=\"button\" name=\"requestButton\" value=\"Request\" onclick=\"visaCalculator()\">Hesapla</button>";
-        }
-    }
-
-    function pressValidityDateNextButton() {
-        var validityDate = document.getElementById("validityDateTime").value;
-        if (validityDate !== "") {
-            showResidencePermitYesAndNo();
-        }
-    }
-
-    function showValidityDate() {
-        document.getElementById("validityDate").innerHTML =
-            "<div class=\"validityDateName\">\n" +
-            "                <label class=\"validityDateLabel\">Vizanın geçerlilik tarixi:\n" +
-            "                    <input type=\"date\" class=\"validityDate\" id=\"validityDateTime\" value=\"date\" onchange=\"pressValidityDateNextButton()\">\n" +
-            "                </label>\n" +
-            "            </div>";
-    }
-
-    function showResidencePermitYesAndNoWithoutValidityDate() {
-        document.getElementById("residencePermitYesAndNo").innerHTML =
-            "<div class=\"residencePermitYesAndNo\">\n" +
-            "                <label class=\"residencePermitName\"> İkamet izni aldınızmı?\n" +
-            "                    <select class=\"custom-select residenceYesAndNoDropdown\" id=\"residencePermitDropdown\" onchange=\"pressResidenceDropdownNextButton()\">\n" +
-            "                        <option value=\"null\">Seçim edin..</option>\n" +
-            "                        <option value=\"Yes\">Evet</option>\n" +
-            "                        <option value=\"No\">Hayır</option>\n" +
-            "                    </select>\n" +
-            "                </label>\n" +
-            "            </div>";
-    }
-
-    function pressPermitDropdownNextButton() {
-        var yesAndNoButton = document.getElementById("visaPermitDropdown").value;
-        if (yesAndNoButton === "Yes") {
-            showValidityDate();
-        } else if (yesAndNoButton === "No") {
-            document.getElementById("validityDate").innerHTML = "";
-            showResidencePermitYesAndNoWithoutValidityDate();
-        }
-    }
-
     function pressEntryDateButton() {
         var entryDate = document.getElementById("entryDate").value;
         if (entryDate !== "") {
@@ -140,6 +70,53 @@
             "            </div>";
     }
 
+    function pressPermitDropdownNextButton() {
+        var yesAndNoButton = document.getElementById("visaPermitDropdown").value;
+        if (yesAndNoButton === "Yes") {
+            showValidityDate();
+        } else if (yesAndNoButton === "No") {
+            document.getElementById("validityDate").innerHTML = "";
+            showResidencePermitYesAndNoWithoutValidityDate();
+        }
+    }
+
+    function showValidityDate() {
+        document.getElementById("validityDate").innerHTML =
+            "<div class=\"validityDateName\">\n" +
+            "                <label class=\"validityDateLabel\">Vizanın geçerlilik tarixi:\n" +
+            "                    <input type=\"date\" class=\"validityDate\" id=\"validityDateTime\" value=\"date\" onchange=\"pressValidityDateNextButton()\">\n" +
+            "                </label>\n" +
+            "            </div>";
+    }
+
+    function pressValidityDateNextButton() {
+        var validityDate = document.getElementById("validityDateTime").value;
+        if (validityDate !== "") {
+            showResidencePermitYesAndNoWithoutValidityDate();
+        }
+    }
+
+    function showResidencePermitYesAndNoWithoutValidityDate() {
+        document.getElementById("residencePermitYesAndNo").innerHTML =
+            "<div class=\"residencePermitYesAndNo\">\n" +
+            "                <label class=\"residencePermitName\"> İkamet izni aldınızmı?\n" +
+            "                    <select class=\"custom-select residenceYesAndNoDropdown\" id=\"residencePermitDropdown\" onchange=\"pressResidenceDropdownNextButton()\">\n" +
+            "                        <option value=\"null\">Seçim edin..</option>\n" +
+            "                        <option value=\"Yes\">Evet</option>\n" +
+            "                        <option value=\"No\">Hayır</option>\n" +
+            "                    </select>\n" +
+            "                </label>\n" +
+            "            </div>";
+    }
+
+    function pressResidenceDropdownNextButton() {
+        var residenceDropdownValue = document.getElementById("residencePermitDropdown").value;
+        if (residenceDropdownValue === "Yes" || residenceDropdownValue === "No") {
+            document.getElementById("requestButton").innerHTML =
+                "<button class=\"requestButton\" type=\"button\" name=\"requestButton\" value=\"Request\" onclick=\"visaCalculator()\">Hesapla</button>";
+        }
+    }
+
     function visaCalculator() {
         var id = document.getElementById("dropdown").value;
         var entryDate = document.getElementById("entryDate").value;
@@ -147,13 +124,13 @@
         var validityDate = document.getElementById("validityDateTime");
         var residencePermit = document.getElementById("residencePermitDropdown").value;
 
-        if (validityDate === null){
+        if (validityDate === null) {
             validityDate = "null";
         } else {
             validityDate = document.getElementById("validityDateTime").value;
         }
 
-        if (id !== "null" && entryDate !== "" &&visaPermitDropdown !== "null" && validityDate !== "" && residencePermit !== "null") {
+        if (id !== "null" && entryDate !== "" && visaPermitDropdown !== "null" && validityDate !== "" && residencePermit !== "null") {
             document.getElementById("totalPenaltyDiv").innerHTML = "";
 
             var xmlHttp = new XMLHttpRequest();
@@ -161,7 +138,11 @@
             url += "&id=" + document.getElementById("dropdown").value;
             url += "&entryDate=" + document.getElementById("entryDate").value;
             url += "&visaValidityDate=" + validityDate;
-            url += "&residencePermit=" + document.getElementById("residencePermitDropdown").value;
+            if (visaPermitDropdown === "Yes" || residencePermit === "Yes") {
+                url += "&residencePermit=" + "Yes";
+            } else {
+                url += "&residencePermit=" + "No";
+            }
             xmlHttp.open("GET", url, false);
             xmlHttp.setRequestHeader('Content-type', 'application/json');
             xmlHttp.send(null);
@@ -211,55 +192,34 @@
     }
 
 </script>
-<div>
 
-    <div id="fromDollarToTl">
-
+<div id="allButtons" class="allButtons">
+    <div class="dropdownCountry">
+        <label class="country">Ülkenizi seçin:
+            <select class="custom-select countryNameDropdown" id="dropdown" name="dropdownCountry"
+                    onchange="pressCountryNextButton()">
+                <option value="null">Seçim edin..</option>
+            </select>
+        </label>
     </div>
 
-    <div id="allButtons">
-        <div class="allButtons">
+    <div id="entryDateName"></div>
 
-            <div class="dropdownCountry">
-                <label class="country">Ülkenizi seçin:
-                    <select class="custom-select countryNameDropdown" id="dropdown" name="dropdownCountry"
-                            onchange="pressCountryNextButton()">
-                        <option value="null">Seçim edin..</option>
-                    </select>
-                </label>
-            </div>
+    <div id="visaYesAndNo"></div>
 
-            <div id="entryDateName">
+    <div id="validityDate"></div>
 
-            </div>
+    <div id="residencePermitYesAndNo"></div>
 
-            <div id="visaYesAndNo">
-
-            </div>
-
-            <div id="validityDate">
-
-            </div>
-
-            <div id="residencePermitYesAndNo">
-
-            </div>
-
-            <div id="requestButton">
-
-            </div>
-
-        </div>
-    </div>
-
-    <div id="totalPenaltyDiv">
-
-    </div>
-
-    <script>
-        showAllCounties();
-    </script>
+    <div id="requestButton"></div>
 
 </div>
+
+<div id="totalPenaltyDiv"></div>
+
+<script>
+    showAllCounties();
+</script>
+
 </body>
 </html>

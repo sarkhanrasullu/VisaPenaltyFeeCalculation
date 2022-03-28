@@ -55,24 +55,6 @@
     font: bold 20px "Times New Roman";
 }
 
-.next {
-    padding-left: 407px;
-}
-
-.nextButton {
-    height: 35px;
-    width: 100px;
-    background: blue;
-    font: bold 20px "Times New Roman";
-    border-radius: 10px;
-    color: white;
-}
-
-.nextButton:hover {
-    background: #6495ED;
-    color: black;
-}
-
 .entryDateName {
     padding-left: 60px;
     padding-bottom: 40px;
