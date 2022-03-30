@@ -11,5 +11,6 @@ public interface CountryService {
 
     List<CountryDto> getAll();
 
-    List<CalculatorDto> calculator(Integer id, String entryDate, String visaValidityDate, String residencePermit) throws ParseException;
+    CalculatorDto calculator(Integer id, String entryDate, String visaPermit,
+                                   String residenceExpiryDate, String logoutDate) throws ParseException;
 }

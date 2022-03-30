@@ -25,12 +25,15 @@ public class CountryController {
     }
 
     @GetMapping("/calculator")
-    public List<CalculatorDto> calculator(
+    public CalculatorDto calculator(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) String entryDate,
-            @RequestParam(required = false) String visaValidityDate,
-            @RequestParam(required = false) String residencePermit
+            @RequestParam(required = false) String visaPermit,
+            @RequestParam(required = false) String residenceExpiryDate,
+            @RequestParam(required = false) String logoutDate
     ) throws ParseException {
-        return countryService.calculator(id, entryDate, visaValidityDate, residencePermit);
+        return countryService.calculator(id, entryDate, visaPermit, residenceExpiryDate, logoutDate);
     }
+
+
 }

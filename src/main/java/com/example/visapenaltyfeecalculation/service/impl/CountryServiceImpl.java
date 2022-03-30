@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -20,7 +19,7 @@ import java.util.List;
 public class CountryServiceImpl implements CountryService {
 
     private static final List<CountryDto> list = CountryDto.countriesList();
-    private static final BigDecimal turkishLira = BigDecimal.valueOf(14.8389);
+    private static final BigDecimal turkishLira = BigDecimal.valueOf(14.833);
 
     @Override
     public List<CountryDto> getAll() {
@@ -28,11 +27,11 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public List<CalculatorDto> calculator(Integer id, String entryDate, String visaValidityDate, String residencePermit) throws ParseException {
-        List<CalculatorDto> calculatorDtoList = new ArrayList<>();
-        CalculatorDto calculatorDto = new CalculatorDto();
-
+    public CalculatorDto calculator(Integer id, String entryDate, String visaPermit,
+                                          String residenceExpiryDate, String logoutDate) throws ParseException {
         CountryDto country = list.get(id - 1);
+
+        CalculatorDto calculatorDto = new CalculatorDto();
         calculatorDto.setFirstMonthPenaltyAmount(BigDecimal.valueOf(0));
         calculatorDto.setMonthlyPenaltyAmount(BigDecimal.valueOf(0));
         calculatorDto.setAdditionalDaysAmount(BigDecimal.valueOf(0));
@@ -42,51 +41,47 @@ public class CountryServiceImpl implements CountryService {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         LocalDate entryLocalDate = dateFormat.parse(entryDate).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        long differentDateOfDays;
-        if (visaValidityDate.equals("null")) {
-            LocalDate currentDate = Instant.now().atZone(ZoneId.systemDefault()).toLocalDate();
-            differentDateOfDays = entryLocalDate.until(currentDate, ChronoUnit.DAYS);
+        if (visaPermit.equals("No") && country.getVisaFee().equals(BigDecimal.valueOf(1033.60))) {
+            calculatorDto.setVisaFee(country.getVisaFee());
         } else {
-            LocalDate validityLocalDate = dateFormat.parse(visaValidityDate).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            differentDateOfDays = entryLocalDate.until(validityLocalDate, ChronoUnit.DAYS);
+            calculatorDto.setVisaFee(BigDecimal.valueOf(0.00));
         }
 
-        BigDecimal cardFee = country.getCardFee();
-        BigDecimal visaFee;
-        if (residencePermit.equals("No") && country.getVisaFee().equals(BigDecimal.valueOf(1033.6))){
-            visaFee = BigDecimal.valueOf(1033.60);
+        long numberOfAdditionalMonths;
+        if (residenceExpiryDate.equals("null")) {
+            LocalDate logoutLocalDate = dateFormat.parse(logoutDate).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            numberOfAdditionalMonths = entryLocalDate.until(logoutLocalDate, ChronoUnit.MONTHS); // 13ay
+            numberOfAdditionalMonths = numberOfAdditionalMonths - country.getVisaDuration(); // 10ay
         } else {
-            visaFee = BigDecimal.valueOf(0.00);
+            LocalDate residenceLocalDate = dateFormat.parse(residenceExpiryDate).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate logoutLocalDate = dateFormat.parse(logoutDate).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            numberOfAdditionalMonths = residenceLocalDate.until(logoutLocalDate, ChronoUnit.MONTHS); // 8ay
         }
-        calculatorDto.setVisaFee(visaFee);
 
-        long numberOfAdditionalDays = differentDateOfDays - (country.getVisaDuration() * 30L); // 350 - 90 = 260
-
-        BigDecimal totalPenaltyAmount = null;
-        if (numberOfAdditionalDays >= 30){
+        BigDecimal totalPenaltyAmount;
+        if (numberOfAdditionalMonths >= 1) { // 8ay  // 10ay
             calculatorDto.setFirstMonthPenaltyAmount(country.getFirstMonthPenaltyAmount().multiply(turkishLira));
-            numberOfAdditionalDays = numberOfAdditionalDays - 30L; // 230
-            if (numberOfAdditionalDays >= 30) {
+            numberOfAdditionalMonths = numberOfAdditionalMonths - 1L; // 7ay  // 9ay
+            if (numberOfAdditionalMonths >= 1) { // 7ay // 9ay
                 calculatorDto.setMonthlyPenaltyAmount(country.getMonthlyPenaltyAmount().multiply(turkishLira));
-                BigDecimal additionalDaysAmount = BigDecimal.valueOf(numberOfAdditionalDays / 30); // 7.666
-                calculatorDto.setAdditionalDaysAmount(additionalDaysAmount);
-                additionalDaysAmount = additionalDaysAmount.multiply(country.getMonthlyPenaltyAmount()); // 7.666 * 10$ = 76.66$
-                additionalDaysAmount = additionalDaysAmount.multiply(turkishLira); // 76.66$ * 14.8389 =  1137.55tl
+                BigDecimal additionalMonthsAmount = BigDecimal.valueOf(numberOfAdditionalMonths); // 7ay // 9ay
+                calculatorDto.setAdditionalDaysAmount(additionalMonthsAmount); // 7ay // 9ay
+                additionalMonthsAmount = additionalMonthsAmount.multiply(country.getMonthlyPenaltyAmount()); // 7 * 10$ = 70$ // 90$
+                additionalMonthsAmount = additionalMonthsAmount.multiply(turkishLira); // 70$ * 14.833 =  1038.31tl // 1334.97tl
 
-                totalPenaltyAmount = visaFee.add(cardFee); // 1193.60tl
-                totalPenaltyAmount = totalPenaltyAmount.add(country.getFirstMonthPenaltyAmount().multiply(turkishLira)); // 1193.60 + (50$ * 15tl) =  1193.60 + 742 = 1935.60tl
-                totalPenaltyAmount = totalPenaltyAmount.add(additionalDaysAmount); // 1935.60 + 1137.55 =  3073tl
+                totalPenaltyAmount = calculatorDto.getVisaFee().add(calculatorDto.getCardFee()); // 0tl + 160tl = 160tl
+                totalPenaltyAmount = totalPenaltyAmount.add(country.getFirstMonthPenaltyAmount().multiply(turkishLira)); // 160tl + (50$ * 14.833tl) =  160tl + 741.65tl = 901.65tl
+                totalPenaltyAmount = totalPenaltyAmount.add(additionalMonthsAmount); // 901.65tl + 1038.31tl = 1939.96tl // 2236.62tl
             } else {
                 assert false;
-                totalPenaltyAmount = visaFee.add(cardFee); // 1033.60 + 160.00 = 1193.60tl
-                totalPenaltyAmount = totalPenaltyAmount.add(country.getFirstMonthPenaltyAmount().multiply(turkishLira)); // 1193.60 + (50$ * 15tl) =  1193.60 + 742 = 1935.60tl
+                totalPenaltyAmount = calculatorDto.getVisaFee().add(calculatorDto.getCardFee()); // 0tl + 160tl = 160tl
+                totalPenaltyAmount = totalPenaltyAmount.add(country.getFirstMonthPenaltyAmount().multiply(turkishLira)); // 160tl + (50$ * 14.833tl) =  160 + 741.65tl = 901.65tl
             }
         } else {
             assert false;
-            totalPenaltyAmount = visaFee.add(cardFee); // 1033.60 + 160.00 = 1193.60tl
+            totalPenaltyAmount = calculatorDto.getVisaFee().add(calculatorDto.getCardFee()); // 0tl + 160tl = 160tl
         }
         calculatorDto.setTotalPenaltyAmount(totalPenaltyAmount);
-        calculatorDtoList.add(calculatorDto);
-        return calculatorDtoList;
+        return calculatorDto;
     }
 }
