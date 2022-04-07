@@ -4,15 +4,13 @@ import com.example.visapenaltyfeecalculation.dto.CalculatorDto;
 import com.example.visapenaltyfeecalculation.dto.CountryDto;
 import com.example.visapenaltyfeecalculation.service.CountryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins="*")
 @RequiredArgsConstructor
 @RequestMapping("/visa")
 public class CountryController {
@@ -34,6 +32,4 @@ public class CountryController {
     ) throws ParseException {
         return countryService.calculator(id, entryDate, visaPermit, residenceExpiryDate, logoutDate);
     }
-
-
 }
