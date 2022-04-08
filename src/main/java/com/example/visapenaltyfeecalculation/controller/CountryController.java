@@ -18,7 +18,7 @@ public class CountryController {
     private final CountryService countryService;
 
     @GetMapping("/countries")
-    public List<CountryDto> getAll() {
+    public List<CountryDto> getAll() throws Exception {
         return countryService.getAll();
     }
 
@@ -29,7 +29,7 @@ public class CountryController {
             @RequestParam(required = false) String visaPermit,
             @RequestParam(required = false) String residenceExpiryDate,
             @RequestParam(required = false) String logoutDate
-    ) throws ParseException {
+    ) throws Exception {
         return countryService.calculator(id, entryDate, visaPermit, residenceExpiryDate, logoutDate);
     }
 }

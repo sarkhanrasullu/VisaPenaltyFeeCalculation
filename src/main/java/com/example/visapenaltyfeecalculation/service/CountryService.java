@@ -9,8 +9,8 @@ import java.util.List;
 
 public interface CountryService {
 
-    List<CountryDto> getAll();
+    List<CountryDto> getAll() throws Exception;
 
     CalculatorDto calculator(Integer id, String entryDate, String visaPermit,
-                                   String residenceExpiryDate, String logoutDate) throws ParseException;
+                                   String residenceExpiryDate, String logoutDate) throws Exception;
 }

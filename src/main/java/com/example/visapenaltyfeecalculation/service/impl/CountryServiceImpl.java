@@ -3,6 +3,12 @@ package com.example.visapenaltyfeecalculation.service.impl;
 import com.example.visapenaltyfeecalculation.dto.CalculatorDto;
 import com.example.visapenaltyfeecalculation.dto.CountryDto;
 import com.example.visapenaltyfeecalculation.service.CountryService;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -12,23 +18,23 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class CountryServiceImpl implements CountryService {
 
     private static final List<CountryDto> list = CountryDto.countriesList();
-    private static final BigDecimal turkishLira = BigDecimal.valueOf(14.833);
+//    private static final BigDecimal turkishLira = BigDecimal.valueOf(14.833);
 
     @Override
-    public List<CountryDto> getAll() {
+    public List<CountryDto> getAll() throws Exception {
         return list;
     }
 
     @Override
     public CalculatorDto calculator(Integer id, String entryDate, String visaPermit,
-                                          String residenceExpiryDate, String logoutDate) throws ParseException {
+                                          String residenceExpiryDate, String logoutDate) throws Exception {
+        BigDecimal turkishLira = returnTurkishLira();
         CountryDto country = list.get(id - 1);
 
         CalculatorDto calculatorDto = new CalculatorDto();
@@ -83,5 +89,20 @@ public class CountryServiceImpl implements CountryService {
         }
         calculatorDto.setTotalPenaltyAmount(totalPenaltyAmount);
         return calculatorDto;
+    }
+
+    public BigDecimal returnTurkishLira() throws Exception {
+        HttpGet get = new HttpGet("https://api.currencyapi.com/v3/latest?apikey=zFiVoXBKitrLOZRrt8gMGVnjSKVngLU4Vwuuj0ol");
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+             CloseableHttpResponse response = httpClient.execute(get)) {
+
+            final String result = EntityUtils.toString(response.getEntity());
+
+            JSONObject jsonObject = new JSONObject(result);
+            JSONObject dataJson = jsonObject.getJSONObject("data");
+            JSONObject tryJson = dataJson.getJSONObject("TRY");
+            return BigDecimal.valueOf(tryJson.getDouble("value"));
+        }
     }
 }
