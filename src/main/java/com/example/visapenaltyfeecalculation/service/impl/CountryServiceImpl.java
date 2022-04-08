@@ -24,10 +24,9 @@ import java.util.List;
 public class CountryServiceImpl implements CountryService {
 
     private static final List<CountryDto> list = CountryDto.countriesList();
-//    private static final BigDecimal turkishLira = BigDecimal.valueOf(14.833);
 
     @Override
-    public List<CountryDto> getAll() throws Exception {
+    public List<CountryDto> getAll(){
         return list;
     }
 

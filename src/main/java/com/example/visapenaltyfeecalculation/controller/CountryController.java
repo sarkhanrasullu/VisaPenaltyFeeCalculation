@@ -18,7 +18,7 @@ public class CountryController {
     private final CountryService countryService;
 
     @GetMapping("/countries")
-    public List<CountryDto> getAll() throws Exception {
+    public List<CountryDto> getAll() {
         return countryService.getAll();
     }
 

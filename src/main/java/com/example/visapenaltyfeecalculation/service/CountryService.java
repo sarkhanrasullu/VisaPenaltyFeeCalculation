@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface CountryService {
 
-    List<CountryDto> getAll() throws Exception;
+    List<CountryDto> getAll();
 
     CalculatorDto calculator(Integer id, String entryDate, String visaPermit,
                                    String residenceExpiryDate, String logoutDate) throws Exception;
