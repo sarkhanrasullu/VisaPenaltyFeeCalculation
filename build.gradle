@@ -23,12 +23,16 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation group: 'net.sf.ehcache', name: 'ehcache', version: '2.10.9.2'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 	implementation 'org.json:json:20141113'
+	implementation group: 'com.jcabi', name: 'jcabi-aspects', version: '0.22.6'
+
 }
 
 tasks.named('test') {

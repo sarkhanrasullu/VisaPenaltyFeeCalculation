@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -26,13 +25,13 @@ public class CountryServiceImpl implements CountryService {
     private static final List<CountryDto> list = CountryDto.countriesList();
 
     @Override
-    public List<CountryDto> getAll(){
+    public List<CountryDto> getAll() {
         return list;
     }
 
     @Override
     public CalculatorDto calculator(Integer id, String entryDate, String visaPermit,
-                                          String residenceExpiryDate, String logoutDate) throws Exception {
+                                    String residenceExpiryDate, String logoutDate) throws Exception {
         BigDecimal turkishLira = returnTurkishLira();
         CountryDto country = list.get(id - 1);
 
@@ -90,7 +89,8 @@ public class CountryServiceImpl implements CountryService {
         return calculatorDto;
     }
 
-    public BigDecimal returnTurkishLira() throws Exception {
+
+    private BigDecimal returnTurkishLira() throws Exception {
         HttpGet get = new HttpGet("https://api.currencyapi.com/v3/latest?apikey=zFiVoXBKitrLOZRrt8gMGVnjSKVngLU4Vwuuj0ol");
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
