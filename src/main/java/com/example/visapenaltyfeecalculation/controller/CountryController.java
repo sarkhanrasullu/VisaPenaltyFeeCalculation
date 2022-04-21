@@ -5,8 +5,6 @@ import com.example.visapenaltyfeecalculation.dto.CountryDto;
 import com.example.visapenaltyfeecalculation.service.CountryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -18,8 +16,8 @@ public class CountryController {
     private final CountryService countryService;
 
     @GetMapping("/countries")
-    public List<CountryDto> getAll() {
-        return countryService.getAll();
+    public List<CountryDto> getAllCountries() {
+        return countryService.getAllCountries();
     }
 
     @GetMapping("/calculator")
