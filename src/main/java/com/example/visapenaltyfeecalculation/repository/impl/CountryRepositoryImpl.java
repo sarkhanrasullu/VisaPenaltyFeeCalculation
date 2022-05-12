@@ -3,13 +3,19 @@ package com.example.visapenaltyfeecalculation.repository.impl;
 import com.example.visapenaltyfeecalculation.dto.CalculatorDto;
 import com.example.visapenaltyfeecalculation.dto.CountryDto;
 import com.example.visapenaltyfeecalculation.repository.CountryRepository;
+import com.example.visapenaltyfeecalculation.repository.CurrencyService;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -22,6 +28,9 @@ import java.util.List;
 @Repository
 public class CountryRepositoryImpl implements CountryRepository {
 
+    @Autowired
+    private CurrencyService currencyService;
+
     private static final List<CountryDto> list = CountryDto.countriesList();
 
     @Override
@@ -32,7 +41,7 @@ public class CountryRepositoryImpl implements CountryRepository {
     @Override
     public CalculatorDto calculator(Integer id, String entryDate, String visaPermit,
                                     String residenceExpiryDate, String logoutDate) throws Exception {
-        BigDecimal turkishLira = returnTurkishLira();
+        BigDecimal turkishLira = currencyService.returnTurkishLira();
         CountryDto country = list.get(id - 1);
 
         CalculatorDto calculatorDto = new CalculatorDto();
@@ -52,7 +61,7 @@ public class CountryRepositoryImpl implements CountryRepository {
         }
 
         long numberOfAdditionalMonths;
-        if (residenceExpiryDate.equals("null")) {
+        if ("null".equalsIgnoreCase(residenceExpiryDate) || residenceExpiryDate==null || residenceExpiryDate.trim().length()==0) {
             LocalDate logoutLocalDate = dateFormat.parse(logoutDate).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             numberOfAdditionalMonths = entryLocalDate.until(logoutLocalDate, ChronoUnit.MONTHS);
             numberOfAdditionalMonths = numberOfAdditionalMonths - country.getVisaDuration();
@@ -89,18 +98,4 @@ public class CountryRepositoryImpl implements CountryRepository {
         return calculatorDto;
     }
 
-    private BigDecimal returnTurkishLira() throws Exception {
-        HttpGet get = new HttpGet("https://api.currencyapi.com/v3/latest?apikey=zFiVoXBKitrLOZRrt8gMGVnjSKVngLU4Vwuuj0ol");
-
-        try (CloseableHttpClient httpClient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpClient.execute(get)) {
-
-            final String result = EntityUtils.toString(response.getEntity());
-
-            JSONObject jsonObject = new JSONObject(result);
-            JSONObject dataJson = jsonObject.getJSONObject("data");
-            JSONObject tryJson = dataJson.getJSONObject("TRY");
-            return BigDecimal.valueOf(tryJson.getDouble("value"));
-        }
-    }
 }
