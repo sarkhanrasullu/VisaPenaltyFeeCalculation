@@ -4,16 +4,11 @@ import com.example.visapenaltyfeecalculation.dto.CalculatorDto;
 import com.example.visapenaltyfeecalculation.dto.CountryDto;
 import com.example.visapenaltyfeecalculation.service.CountryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.math.BigDecimal;
-import java.text.ParseException;
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins="*")
 @RequiredArgsConstructor
 @RequestMapping("/visa")
 public class CountryController {
@@ -21,19 +16,18 @@ public class CountryController {
     private final CountryService countryService;
 
     @GetMapping("/countries")
-    public List<CountryDto> getAll() {
-        return countryService.getAll();
+    public List<CountryDto> getAllCountries() {
+        return countryService.getAllCountries();
     }
 
     @GetMapping("/calculator")
-    public List<CalculatorDto> calculator(
+    public CalculatorDto calculator(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) String entryDate,
-            @RequestParam String visaValidityDate,
-            @RequestParam(required = false) String residencePermit
-    ) throws ParseException {
-       return countryService.calculator(id, entryDate, visaValidityDate, residencePermit);
+            @RequestParam(required = false) String visaPermit,
+            @RequestParam(required = false) String residenceExpiryDate,
+            @RequestParam(required = false) String logoutDate
+    ) throws Exception {
+        return countryService.calculator(id, entryDate, visaPermit, residenceExpiryDate, logoutDate);
     }
-
-
 }
